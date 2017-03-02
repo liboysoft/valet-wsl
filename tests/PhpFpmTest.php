@@ -38,7 +38,7 @@ class PhpFpmTest extends TestCase
         $contents = file_get_contents(__DIR__.'/output/valet.conf');
         $this->assertContains(sprintf("\nuser = %s", user()), $contents);
         $this->assertContains(sprintf("\nlisten.owner = %s", user()), $contents);
-        $this->assertContains("\nlisten = ".VALET_HOME_PATH."/valet.sock", $contents);
+        $this->assertContains("\nlisten = 127.0.0.1:9000", $contents);
     }
 }
 

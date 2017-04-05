@@ -61,9 +61,16 @@ class Nginx
     {
         $contents = $this->files->get(__DIR__.'/../stubs/nginx.conf');
 
+        $pid_string = 'pid /run/nginx.pid';
+        $hasPIDoption = strpos($this->cli->run('systemctl status nginx | grep ExecStart='), ' pid /');
+
+        if ($hasPIDoption) {
+            $pid_string = '# pid /run/nginx.pid';
+        }
+
         $this->files->putAsUser(
             '/etc/nginx/nginx.conf',
-            str_replace(['VALET_USER', 'VALET_HOME_PATH'], [user(), VALET_HOME_PATH], $contents)
+            str_replace(['VALET_USER', 'VALET_HOME_PATH', 'VALET_PID'], [user(), VALET_HOME_PATH, $pid_string], $contents)
         );
     }
 
@@ -77,8 +84,8 @@ class Nginx
         $this->files->putAsUser(
             '/etc/nginx/sites-available/valet.conf',
             str_replace(
-                ['VALET_HOME_PATH', 'VALET_SERVER_PATH'],
-                [VALET_HOME_PATH, VALET_SERVER_PATH],
+                ['VALET_HOME_PATH', 'VALET_SERVER_PATH', 'VALET_PORT'],
+                [VALET_HOME_PATH, VALET_SERVER_PATH, '80'],
                 $this->files->get(__DIR__.'/../stubs/valet.conf')
             )
         );
@@ -114,6 +121,24 @@ class Nginx
     }
 
     /**
+     * Update the port used by Nginx.
+     *
+     * @param  string  $newPort
+     * @return void
+     */
+    function updatePort($newPort)
+    {
+        $this->files->putAsUser(
+            '/etc/nginx/sites-available/valet.conf',
+            str_replace(
+                ['VALET_HOME_PATH', 'VALET_SERVER_PATH', 'VALET_PORT'],
+                [VALET_HOME_PATH, VALET_SERVER_PATH, $newPort],
+                $this->files->get(__DIR__.'/../stubs/valet.conf')
+            )
+        );
+    }
+
+    /**
      * Generate fresh Nginx servers for existing secure sites.
      *
      * @return void
@@ -143,6 +168,16 @@ class Nginx
     function stop()
     {
         $this->sm->stop('nginx');
+    }
+
+    /**
+     * Nginx service status.
+     *
+     * @return void
+     */
+    function status()
+    {
+        $this->sm->printStatus('nginx');
     }
 
     /**

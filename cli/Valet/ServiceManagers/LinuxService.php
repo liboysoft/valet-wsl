@@ -8,7 +8,7 @@ use Valet\Contracts\ServiceManager;
 
 class LinuxService implements ServiceManager
 {
-    var $cli;
+    public $cli;
 
     /**
      * Create a new Brew instance.
@@ -26,7 +26,7 @@ class LinuxService implements ServiceManager
      * @param
      * @return void
      */
-    function start($services)
+    public function start($services)
     {
         $services = is_array($services) ? $services : func_get_args();
 
@@ -42,7 +42,7 @@ class LinuxService implements ServiceManager
      * @param
      * @return void
      */
-    function stop($services)
+    public function stop($services)
     {
         $services = is_array($services) ? $services : func_get_args();
 
@@ -58,7 +58,7 @@ class LinuxService implements ServiceManager
      * @param
      * @return void
      */
-    function restart($services)
+    public function restart($services)
     {
         $services = is_array($services) ? $services : func_get_args();
 
@@ -69,13 +69,54 @@ class LinuxService implements ServiceManager
     }
 
     /**
+     * Status of the given services.
+     *
+     * @param
+     * @return void
+     */
+    public function printStatus($services)
+    {
+        $services = is_array($services) ? $services : func_get_args();
+
+        foreach ($services as $service) {
+            $status = $this->cli->run('service '.$this->getRealService($service).' status | grep "Active:"');
+            $running = strpos(trim($status), 'running');
+
+            if ($running) {
+                info(ucfirst($service).' is running...');
+            } else {
+                warning(ucfirst($service).' is stopped...');
+            }
+        }
+    }
+
+    /**
+     * Status of the given services.
+     *
+     * @param
+     * @return void
+     */
+    public function status($service)
+    {
+        return $this->cli->run('service '.$this->getRealService($service).' status');
+    }
+
+    /**
      * Determine if service manager is available on the system.
      *
      * @return bool
      */
-    function isAvailable()
+    public function isAvailable()
     {
-        return $this->cli->run('which service') != '';
+        try {
+            $output = $this->cli->run('which service', function ($exitCode, $output) {
+                throw new DomainException('Service not available');
+            });
+
+            return $output != '';
+        } catch (DomainException $e) {
+            return false;
+        }
     }
 
     /**
@@ -84,7 +125,7 @@ class LinuxService implements ServiceManager
      * @param string $service
      * @return string
      */
-    function getRealService($service)
+    public function getRealService($service)
     {
         return collect($service)->first(function ($service) {
             return !strpos($this->cli->run('service ' . $service . ' status'), 'not-found');

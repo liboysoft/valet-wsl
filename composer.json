@@ -1,7 +1,7 @@
 {
     "name": "valeryan/valet-wsl",
     "description": "A more enjoyable local development experience for Windows Subsystem for Linux.",
-    "keywords": ["laravel", "zonda", "wwdhhd", "ubuntu", "fedora"],
+    "keywords": ["laravel", "valet", "wsl", "windows subsystem for linux", "ubuntu"],
     "license": "MIT",
     "authors": [
         {
@@ -33,6 +33,11 @@
         ],
         "psr-4": {
             "Valet\\": "cli/Valet/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Valet\\Tests\\": "tests/"
         }
     },
     "require": {

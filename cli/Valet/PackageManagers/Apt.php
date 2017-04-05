@@ -86,18 +86,6 @@ class Apt implements PackageManager
     }
 
     /**
-     * Get installed PHP version.
-     *
-     * @return string
-     */
-    function getPHPVersion()
-    {
-        $packages = $this->packages('php[0-9]*cli');
-
-        return explode('php', strtok($packages[0], '-'))[1];
-    }
-
-    /**
      * Restart dnsmasq in Ubuntu.
      */
     function dnsmasqRestart($sm)

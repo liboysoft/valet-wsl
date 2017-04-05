@@ -28,6 +28,7 @@ class Configuration
         $this->createSitesDirectory();
         $this->createExtensionsDirectory();
         $this->createLogDirectory();
+        $this->createCertificatesDirectory();
         $this->writeBaseConfiguration();
 
         $this->files->chown($this->path(), user());
@@ -41,7 +42,7 @@ class Configuration
     function uninstall()
     {
         if ($this->files->isDir(VALET_HOME_PATH, user())) {
-            $this->files->unlink(VALET_HOME_PATH, user());
+            $this->files->remove(VALET_HOME_PATH);
         }
     }
 
@@ -107,12 +108,22 @@ class Configuration
     }
 
     /**
+     * Create the directory for SSL certificates.
+     *
+     * @return void
+     */
+    function createCertificatesDirectory()
+    {
+        $this->files->ensureDirExists(VALET_HOME_PATH.'/Certificates', user());
+    }
+
+    /**
      * Write the base, initial configuration for Valet.
      */
     function writeBaseConfiguration()
     {
         if (! $this->files->exists($this->path())) {
-            $this->write(['domain' => 'dev', 'paths' => []]);
+            $this->write(['domain' => 'dev', 'paths' => [], 'port' => '80']);
         }
     }
 

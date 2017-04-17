@@ -52,6 +52,9 @@
         "mockery/mockery": "~0.9.4",
         "phpunit/phpunit": "~5.5"
     },
+    "scripts": {
+        "post-update-cmd": "cli/scripts/update.sh"
+    },
     "bin": [
         "valet"
     ]

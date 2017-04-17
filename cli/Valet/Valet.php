@@ -18,7 +18,7 @@ class Valet
 
     var $valetBin = '/usr/local/bin/valet';
     var $sudoers  = '/etc/sudoers.d/valet';
-    var $github   = 'https://api.github.com/repos/cpriego/valet-linux/releases/latest';
+    var $github   = 'https://api.github.com/repos/valeryan/valet-wsl/releases/latest';
 
     /**
      * Create a new Valet instance.
